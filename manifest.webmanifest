@@ -1,0 +1,21 @@
+{
+  "name": "IBSAA MANAGER – General Store POS & Management System",
+  "short_name": "IBSAA MANAGER",
+  "description": "General Store POS and Management System",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f4f6f8",
+  "theme_color": "#0b5d3b",
+  "lang": "om",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

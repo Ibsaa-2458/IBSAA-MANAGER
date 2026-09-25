@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="om">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b5d3b">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="IBSAA MANAGER">
+<link rel="manifest" href="manifest.webmanifest">
+<title>IBSAA MANAGER</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f4f6f8;color:#17202a}
+header{background:#0b5d3b;color:#fff;padding:18px;text-align:center;position:sticky;top:0;z-index:5}
+header h1{margin:0;font-size:24px}header p{margin:5px 0 0}
+nav{display:flex;gap:7px;overflow:auto;padding:10px;background:#fff;position:sticky;top:74px;z-index:4}
+nav button,.btn{border:0;border-radius:8px;padding:10px 13px;background:#0b5d3b;color:#fff;cursor:pointer}
+nav button{white-space:nowrap}.danger{background:#b42318}.secondary{background:#667085}
+main{max-width:1100px;margin:auto;padding:15px}.page{display:none}.page.active{display:block}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.card,.panel{background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 10px #00000012;margin-bottom:14px}
+.card b{font-size:26px;display:block;margin-top:8px}
+form{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+input,select{width:100%;padding:11px;border:1px solid #d0d5dd;border-radius:8px;background:#fff}
+.full{grid-column:1/-1}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;background:#fff}th,td{padding:9px;border-bottom:1px solid #eee;text-align:left;white-space:nowrap}
+img.thumb{width:55px;height:55px;object-fit:cover;border-radius:8px}.preview{max-width:120px;max-height:120px;margin-top:6px;border-radius:8px}
+.actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.small{font-size:12px;color:#667085}.profit{color:#087443;font-weight:bold}
+</style>
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+</head>
+<body>
+<header><h1>IBSAA MANAGER</h1><p>General Store POS & Management System</p></header>
+<nav>
+<button onclick="show('dash')">Dashboard</button><button onclick="show('products')">Products</button>
+<button onclick="show('sales')">POS / Gurgurtaa</button><button onclick="show('customers')">Maamiltoota</button>
+<button onclick="show('expenses')">Baasiilee</button><button onclick="show('reports')">Reports</button>
+</nav>
+<main>
+<section id="dash" class="page active">
+<h2>Dashboard</h2><div class="cards">
+<div class="card">Products<b id="kProducts">0</b></div>
+<div class="card">Stock Units<b id="kStock">0</b></div>
+<div class="card">Sales<b id="kSales">0</b></div>
+<div class="card">Revenue<b id="kRevenue">0.00</b></div>
+<div class="card">Profit<b class="profit" id="kProfit">0.00</b></div>
+<div class="card">Expenses<b id="kExpenses">0.00</b></div>
+</div>
+<div class="panel"><b>Hojii saffisaa</b><div class="actions">
+<button class="btn" onclick="show('products')">+ Product</button><button class="btn" onclick="show('sales')">+ Sale</button>
+<button class="btn" onclick="show('customers')">+ Customer</button><button class="btn secondary" onclick="backup()">Backup</button>
+<button class="btn secondary" onclick="document.getElementById('restore').click()">Restore</button><input id="restore" type="file" accept=".json" style="display:none" onchange="restore(event)">
+</div></div>
+</section>
+
+<section id="products" class="page">
+<h2>Products / Meeshaalee</h2>
+<div class="panel"><form id="productForm">
+<input id="pname" placeholder="Maqaa meeshaa" required><input id="pcat" placeholder="Category">
+<input id="buy" type="number" step="0.01" placeholder="Gatii bittaa" required><input id="sell" type="number" step="0.01" placeholder="Gatii gurgurtaa" required>
+<input id="stock" type="number" step="1" placeholder="Stock" required><input id="minstock" type="number" value="5" placeholder="Low stock limit">
+<div class="full"><label>📷 Product Image (Camera/Gallery)</label><input id="pimg" type="file" accept="image/*" capture="environment"><img id="preview" class="preview" hidden></div>
+<div class="full"><button class="btn">Save Product</button></div>
+</form></div>
+<div class="panel tablewrap"><table><thead><tr><th>Suuraa</th><th>Maqaa</th><th>Category</th><th>Buy</th><th>Sell</th><th>Stock</th><th>Action</th></tr></thead><tbody id="productRows"></tbody></table></div>
+</section>
+
+<section id="sales" class="page">
+<h2>POS / Gurgurtaa</h2>
+<div class="panel"><form id="saleForm">
+<select id="saleProduct" required></select><input id="qty" type="number" min="1" value="1" required>
+<select id="pay"><option>Cash</option><option>Bank</option><option>Telebirr</option><option>CBE Birr</option></select>
+<input id="customerName" placeholder="Maqaa maamilaa (optional)"><div class="full"><button class="btn">Record Sale</button></div>
+</form></div>
+<div class="panel tablewrap"><table><thead><tr><th>Guyyaa</th><th>Product</th><th>Qty</th><th>Total</th><th>Payment</th><th>Customer</th></tr></thead><tbody id="saleRows"></tbody></table></div>
+</section>
+
+<section id="customers" class="page">
+<h2>Maamiltoota</h2><div class="panel"><form id="customerForm"><input id="cname" placeholder="Maqaa" required><input id="phone" placeholder="Phone"><input id="debt" type="number" step="0.01" value="0" placeholder="Liqii"><button class="btn">Save Customer</button></form></div>
+<div class="panel tablewrap"><table><thead><tr><th>Maqaa</th><th>Phone</th><th>Liqii</th><th>Action</th></tr></thead><tbody id="customerRows"></tbody></table></div>
+</section>
+
+<section id="expenses" class="page">
+<h2>Baasiilee</h2><div class="panel"><form id="expenseForm"><input id="edesc" placeholder="Ibsa baasi" required><input id="eamount" type="number" step="0.01" placeholder="Amount" required><button class="btn">Save Expense</button></form></div>
+<div class="panel tablewrap"><table><thead><tr><th>Guyyaa</th><th>Ibsa</th><th>Amount</th><th>Action</th></tr></thead><tbody id="expenseRows"></tbody></table></div>
+</section>
+
+<section id="reports" class="page">
+<h2>Reports</h2><div class="cards">
+<div class="card">Total Revenue<b id="rRevenue">0</b></div><div class="card">Cost of Goods<b id="rCost">0</b></div>
+<div class="card">Gross Profit<b class="profit" id="rGross">0</b></div><div class="card">Expenses<b id="rExp">0</b></div>
+<div class="card">Net Profit<b class="profit" id="rNet">0</b></div>
+</div>
+<div class="panel"><button class="btn" onclick="backup()">Download Backup</button> <button class="btn danger" onclick="clearAll()">Delete All Data</button></div>
+</section>
+</main>
+<script>
+const key='ibsaa_manager_v3_web';
+let db=JSON.parse(localStorage.getItem(key)||'{"products":[],"sales":[],"customers":[],"expenses":[]}');
+const $=id=>document.getElementById(id);
+function save(){localStorage.setItem(key,JSON.stringify(db));render()}
+function show(id){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');render()}
+function money(n){return Number(n||0).toFixed(2)}
+$('pimg').onchange=e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{$('preview').src=r.result;$('preview').hidden=false};r.readAsDataURL(f)}
+$('productForm').onsubmit=e=>{e.preventDefault();let f=$('pimg').files[0];let add=img=>{db.products.push({id:Date.now(),name:$('pname').value,cat:$('pcat').value,buy:+$('buy').value,sell:+$('sell').value,stock:+$('stock').value,min:+$('minstock').value,img:img||''});e.target.reset();$('preview').hidden=true;save()};if(f){let r=new FileReader();r.onload=()=>add(r.result);r.readAsDataURL(f)}else add('')}
+$('saleForm').onsubmit=e=>{e.preventDefault();let p=db.products.find(x=>x.id==$('saleProduct').value),q=+$('qty').value;if(!p||q<1||p.stock<q)return alert('Stock gahaa miti.');p.stock-=q;db.sales.push({date:new Date().toLocaleString(),pid:p.id,name:p.name,qty:q,total:q*p.sell,cost:q*p.buy,pay:$('pay').value,customer:$('customerName').value});save();e.target.reset();$('qty').value=1}
+$('customerForm').onsubmit=e=>{e.preventDefault();db.customers.push({id:Date.now(),name:$('cname').value,phone:$('phone').value,debt:+$('debt').value});e.target.reset();save()}
+$('expenseForm').onsubmit=e=>{e.preventDefault();db.expenses.push({id:Date.now(),date:new Date().toLocaleString(),desc:$('edesc').value,amount:+$('eamount').value});e.target.reset();save()}
+function del(type,id){if(confirm('Delete?')){db[type]=db[type].filter(x=>x.id!=id);save()}}
+function render(){
+$('kProducts').textContent=db.products.length;$('kStock').textContent=db.products.reduce((a,x)=>a+x.stock,0);$('kSales').textContent=db.sales.length;
+let rev=db.sales.reduce((a,x)=>a+x.total,0),cost=db.sales.reduce((a,x)=>a+x.cost,0),exp=db.expenses.reduce((a,x)=>a+x.amount,0);
+$('kRevenue').textContent=money(rev);$('kProfit').textContent=money(rev-cost-exp);$('kExpenses').textContent=money(exp);
+$('rRevenue').textContent=money(rev);$('rCost').textContent=money(cost);$('rGross').textContent=money(rev-cost);$('rExp').textContent=money(exp);$('rNet').textContent=money(rev-cost-exp);
+$('productRows').innerHTML=db.products.map(p=>`<tr><td>${p.img?`<img class="thumb" src="${p.img}">`:'—'}</td><td>${esc(p.name)}</td><td>${esc(p.cat)}</td><td>${money(p.buy)}</td><td>${money(p.sell)}</td><td>${p.stock}${p.stock<=p.min?' ⚠️':''}</td><td><button class="btn danger" onclick="del('products',${p.id})">Delete</button></td></tr>`).join('');
+$('saleProduct').innerHTML=db.products.map(p=>`<option value="${p.id}">${esc(p.name)} — ${money(p.sell)} (Stock ${p.stock})</option>`).join('');
+$('saleRows').innerHTML=db.sales.slice().reverse().map(s=>`<tr><td>${s.date}</td><td>${esc(s.name)}</td><td>${s.qty}</td><td>${money(s.total)}</td><td>${esc(s.pay)}</td><td>${esc(s.customer||'')}</td></tr>`).join('');
+$('customerRows').innerHTML=db.customers.map(c=>`<tr><td>${esc(c.name)}</td><td>${esc(c.phone)}</td><td>${money(c.debt)}</td><td><button class="btn danger" onclick="del('customers',${c.id})">Delete</button></td></tr>`).join('');
+$('expenseRows').innerHTML=db.expenses.slice().reverse().map(x=>`<tr><td>${x.date}</td><td>${esc(x.desc)}</td><td>${money(x.amount)}</td><td><button class="btn danger" onclick="del('expenses',${x.id})">Delete</button></td></tr>`).join('');
+}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function backup(){let blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='IBSAA_MANAGER_Backup.json';a.click()}
+function restore(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{db=JSON.parse(r.result);save();alert('Restore milkaaʼe.')}catch{alert('Backup sirrii miti.')}};r.readAsText(f)}
+function clearAll(){if(confirm('Data hunda haqaa?')){db={products:[],sales:[],customers:[],expenses:[]};save()}}
+render();
+</script>
+
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(console.error));
+}
+let deferredInstallPrompt;
+window.addEventListener("beforeinstallprompt", e => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+});
+</script>
+</body>
+</html>
