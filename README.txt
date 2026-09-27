@@ -15,7 +15,7 @@ HOW TO INSTALL ON ANDROID
 2. Open the app URL in Google Chrome.
 3. Open Chrome menu (⋮).
 4. Tap "Add to Home screen" or "Install app" when available.
-5. Open IBSAA MANAGER from the new home-screen icon.
+5. Open ESY SHOP from the new home-screen icon.
 
 IMPORTANT
 - PWA installation normally requires HTTPS (or localhost). Opening index.html directly from a file manager may show the web app but may not allow service-worker installation.
