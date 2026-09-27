@@ -1,20 +1,15 @@
 {
-  "name": "ESY SHOP – General Store POS & Management System",
+  "name": "ESY SHOP - General Store POS & Management",
   "short_name": "ESY SHOP",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#06152f",
-  "theme_color": "#0b1d3a",
+  "theme_color": "#0b5d3b",
   "icons": [
     {
-      "src": "./icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "./icon-512.png",
+      "src": "./icon.svg",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/svg+xml"
     }
   ]
 }
