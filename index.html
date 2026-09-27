@@ -31,7 +31,7 @@ img.thumb{width:55px;height:55px;object-fit:cover;border-radius:8px}.preview{max
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 </head>
 <body>
-<header><h1>IBSAA MANAGER</h1><p>General Store POS & Management System</p></header>
+<header><h1>ESY SHOP</h1><p>General Store POS & Management System</p></header>
 <nav>
 <button onclick="show('dash')">Dashboard</button><button onclick="show('products')">Products</button>
 <button onclick="show('sales')">POS / Gurgurtaa</button><button onclick="show('customers')">Maamiltoota</button>
@@ -96,7 +96,7 @@ img.thumb{width:55px;height:55px;object-fit:cover;border-radius:8px}.preview{max
 </section>
 </main>
 <script>
-const key='ibsaa_manager_v3_web';
+const key='ESY_SHOP_v3_web';
 let db=JSON.parse(localStorage.getItem(key)||'{"products":[],"sales":[],"customers":[],"expenses":[]}');
 const $=id=>document.getElementById(id);
 function save(){localStorage.setItem(key,JSON.stringify(db));render()}
