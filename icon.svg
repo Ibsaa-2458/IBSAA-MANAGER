@@ -1,7 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-<rect width="512" height="512" rx="110" fill="#0b5d3b"/>
-<rect x="80" y="115" width="352" height="282" rx="34" fill="#fff"/>
-<path d="M125 190h262M125 245h262M125 300h160" stroke="#0b5d3b" stroke-width="28" stroke-linecap="round"/>
-<circle cx="365" cy="335" r="45" fill="#0b5d3b"/>
-<path d="M346 335l14 14 27-31" fill="none" stroke="#fff" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect width="512" height="512" rx="110" fill="#0b5d3b"/>
+  <path d="M125 190h262l-22 210H147z" fill="#fff"/>
+  <path d="M175 190c0-65 36-105 81-105s81 40 81 105"
+        fill="none" stroke="#fff" stroke-width="28"
+        stroke-linecap="round"/>
+  <text x="256" y="285" text-anchor="middle"
+        font-family="Arial,sans-serif" font-size="62"
+        font-weight="bold" fill="#0b5d3b">ESY</text>
+  <text x="256" y="350" text-anchor="middle"
+        font-family="Arial,sans-serif" font-size="45"
+        font-weight="bold" fill="#0b5d3b">SHOP</text>
 </svg>
