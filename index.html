@@ -120,41 +120,43 @@ $('productForm').onsubmit = e => {
   }
 
   if (buy <= 0) {
-    alert('Gatii bittaa sirrii galchi.');
+    alert('Gatii bitaa sirrii galchi.');
     return;
   }
 
   const addProduct = img => {
-  db.products.push({
-    id: Date.now(),
-    name: name,
-    cat: $('pcat').value,
-    buy: buy,
-    sell: Number($('sell').value),
-    stock: stock,
-    min: Number($('minstock').value),
-    img: img || ''
-  });
 
-  save();
-  render();
-  e.target.reset();
+    db.products.push({
+      id: Date.now(),
+      name: name,
+      cat: '',
+      buy: buy,
+      sell: buy,
+      stock: stock,
+      min: 0,
+      img: img || ''
+    });
 
-  if ($('preview')) {
-    $('preview').hidden = true;
-  }
+    save();
+    render();
+    e.target.reset();
 
-  alert('✅ Product save taʼeera!');
-};
-
-if (file) {
-  const reader = new FileReader();
-
-  reader.onload = () => {
-    addProduct(reader.result);
+    alert('✅ Product save taʼeera!');
   };
 
-  reader.readAsDataURL(file);
+  if (file) {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      addProduct(reader.result);
+    };
+
+    reader.readAsDataURL(file);
+
+  } else {
+    addProduct('');
+  }
+};
 } else {
   addProduct('');
 }$('customerForm').onsubmit=e=>{e.preventDefault();db.customers.push({id:Date.now(),name:$('cname').value,phone:$('phone').value,debt:+$('debt').value});e.target.reset();save()}
