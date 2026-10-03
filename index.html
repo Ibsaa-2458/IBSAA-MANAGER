@@ -125,37 +125,39 @@ $('productForm').onsubmit = e => {
   }
 
   const addProduct = img => {
-    db.products.push({
-      id: Date.now(),
-      name: name,
-      cat: '',
-      buy: buy,
-      sell: buy,
-      stock: stock,
-      min: 0,
-      img: img || ''
-    });
+  db.products.push({
+    id: Date.now(),
+    name: name,
+    cat: $('pcat').value,
+    buy: buy,
+    sell: Number($('sell').value),
+    stock: stock,
+    min: Number($('minstock').value),
+    img: img || ''
+  });
 
-    save();
-    render();
-    e.target.reset();
+  save();
+  render();
+  e.target.reset();
 
-    alert('✅ Product save taʼeera!');
+  if ($('preview')) {
+    $('preview').hidden = true;
+  }
+
+  alert('✅ Product save taʼeera!');
+};
+
+if (file) {
+  const reader = new FileReader();
+
+  reader.onload = () => {
+    addProduct(reader.result);
   };
 
-  if (file) {
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      addProduct(reader.result);
-    };
-
-    reader.readAsDataURL(file);
-  } else {
-    addProduct('');
-  }
-};$('saleForm').onsubmit=e=>{e.preventDefault();let p=db.products.find(x=>x.id==$('saleProduct').value),q=+$('qty').value;if(!p||q<1||p.stock<q)return alert('Stock gahaa miti.');p.stock-=q;db.sales.push({date:new Date().toLocaleString(),pid:p.id,name:p.name,qty:q,total:q*p.sell,cost:q*p.buy,pay:$('pay').value,customer:$('customerName').value});save();e.target.reset();$('qty').value=1}
-$('customerForm').onsubmit=e=>{e.preventDefault();db.customers.push({id:Date.now(),name:$('cname').value,phone:$('phone').value,debt:+$('debt').value});e.target.reset();save()}
+  reader.readAsDataURL(file);
+} else {
+  addProduct('');
+}$('customerForm').onsubmit=e=>{e.preventDefault();db.customers.push({id:Date.now(),name:$('cname').value,phone:$('phone').value,debt:+$('debt').value});e.target.reset();save()}
 $('expenseForm').onsubmit=e=>{e.preventDefault();db.expenses.push({id:Date.now(),date:new Date().toLocaleString(),desc:$('edesc').value,amount:+$('eamount').value});e.target.reset();save()}
 function del(type,id){if(confirm('Delete?')){db[type]=db[type].filter(x=>x.id!=id);save()}}
 function render(){
