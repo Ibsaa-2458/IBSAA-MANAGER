@@ -107,53 +107,77 @@ function show(id){document.querySelectorAll('.page').forEach(x=>x.classList.remo
 function money(n){return Number(n||0).toFixed(2)}
 $('pimg').onchange=e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{$('preview').src=r.result;$('preview').hidden=false};r.readAsDataURL(f)}
 $('productForm').onsubmit = e => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const name = $('pname').value.trim();
-  const buy = Number($('buy').value);
-  const stock = Number($('stock').value);
-  const file = $('pimg') ? $('pimg').files[0] : null;
+    const name = $('pname').value.trim();
+    const cat = $('pcat') ? $('pcat').value : '';
+    const buy = Number($('buy').value);
+    const sell = $('sell') ? Number($('sell').value) : buy;
+    const stock = Number($('stock').value);
+    const min = $('minstock') ? Number($('minstock').value) : 0;
+    const file = $('pimg') ? $('pimg').files[0] : null;
 
-  if (!name) {
-    alert('Maqaa meeshaa galchi.');
-    return;
-  }
+    if (!name) {
+        alert('Maqaa meeshaa galchi.');
+        return;
+    }
 
-  if (buy <= 0) {
-    alert('Gatii bitaa sirrii galchi.');
-    return;
-  }
+    if (buy <= 0) {
+        alert('Gatii bittaa sirrii galchi.');
+        return;
+    }
 
-  const addProduct = img => {
+    if (sell <= 0) {
+        alert('Gatii gurgurtaa sirrii galchi.');
+        return;
+    }
 
-    db.products.push({
-      id: Date.now(),
-      name: name,
-      cat: '',
-      buy: buy,
-      sell: buy,
-      stock: stock,
-      min: 0,
-      img: img || ''
-    });
+    if (!db.products) {
+        db.products = [];
+    }
 
-    save();
-    render();
-    e.target.reset();
+    const addProduct = img => {
 
-    alert('✅ Product save taʼeera!');
-  };
+        db.products.push({
+            id: Date.now(),
+            name: name,
+            cat: cat,
+            buy: buy,
+            sell: sell,
+            stock: stock,
+            min: min,
+            img: img || ''
+        });
 
-  if (file) {
-    const reader = new FileReader();
+        localStorage.setItem(
+            key,
+            JSON.stringify(db)
+        );
 
-    reader.onload = () => {
-      addProduct(reader.result);
+        render();
+
+        e.target.reset();
+
+        alert('✅ Product sirriitti save ta\'eera!');
     };
 
-    reader.readAsDataURL(file);
+    if (file) {
+        const reader = new FileReader();
 
-  } else {
+        reader.onload = () => {
+            addProduct(reader.result);
+        };
+
+        reader.onerror = () => {
+            alert('Suuraa dubbisuu hin dandeenye.');
+        };
+
+        reader.readAsDataURL(file);
+
+    } else {
+        addProduct('');
+    }
+};
     addProduct('');
   }
 };
