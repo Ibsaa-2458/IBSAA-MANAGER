@@ -106,7 +106,7 @@ function save(){localStorage.setItem(key,JSON.stringify(db));render()}
 function show(id){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');render()}
 function money(n){return Number(n||0).toFixed(2)}
 $('pimg').onchange=e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{$('preview').src=r.result;$('preview').hidden=false};r.readAsDataURL(f)}
-<script>
+
 $('productForm').onsubmit = function(e) {
     e.preventDefault();
 
