@@ -170,7 +170,7 @@ $('productForm').onsubmit = function(e) {
         addProduct('');
     }
     };
-}$('customerForm').onsubmit=e=>{e.preventDefault();db.customers.push({id:Date.now(),name:$('cname').value,phone:$('phone').value,debt:+$('debt').value});e.target.reset();save()}
+$('customerForm').onsubmit=e=>{e.preventDefault();db.customers.push({id:Date.now(),name:$('cname').value,phone:$('phone').value,debt:+$('debt').value});e.target.reset();save()}
 $('expenseForm').onsubmit=e=>{e.preventDefault();db.expenses.push({id:Date.now(),date:new Date().toLocaleString(),desc:$('edesc').value,amount:+$('eamount').value});e.target.reset();save()}
 function del(type,id){if(confirm('Delete?')){db[type]=db[type].filter(x=>x.id!=id);save()}}
 function render(){
