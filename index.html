@@ -99,103 +99,446 @@ img.thumb{width:55px;height:55px;object-fit:cover;border-radius:8px}.preview{max
 </section>
 </main>
 <script>
-const key='ESY_SHOP_v3_web';
-let db=JSON.parse(localStorage.getItem(key)||'{"products":[],"sales":[],"customers":[],"expenses":[]}');
-const $=id=>document.getElementById(id);
-function save(){localStorage.setItem(key,JSON.stringify(db));render()}
-function show(id){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');render()}
-function money(n){return Number(n||0).toFixed(2)}
-$('pimg').onchange=e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{$('preview').src=r.result;$('preview').hidden=false};r.readAsDataURL(f)}
+const key = 'ESY_SHOP_v3_web';
 
-$('productForm').onsubmit = function(e) {
-    e.preventDefault();
+let db = JSON.parse(localStorage.getItem(key)) || {
+    products: [],
+    sales: [],
+    customers: [],
+    expenses: []
+};
 
-    const name = $('pname').value.trim();
-    const cat = $('pcat') ? $('pcat').value : '';
-    const buy = Number($('buy').value);
-    const sell = Number($('sell').value);
-    const stock = Number($('stock').value);
-    const min = $('minstock') ? Number($('minstock').value) : 0;
-    const file = $('pimg') ? $('pimg').files[0] : null;
+const $ = id => document.getElementById(id);
 
-    if (!name) {
-        alert('Maqaa meeshaa galchi.');
-        return;
-    }
+function save() {
+    localStorage.setItem(key, JSON.stringify(db));
+}
 
-    if (buy <= 0) {
-        alert('Gatii bittaa sirrii galchi.');
-        return;
-    }
+function show(id) {
+    document.querySelectorAll('.section').forEach(x => {
+        x.style.display = 'none';
+    });
 
-    if (sell <= 0) {
-        alert('Gatii gurgurtaa sirrii galchi.');
-        return;
-    }
+    const el = $(id);
+    if (el) el.style.display = 'block';
+}
 
-    const addProduct = function(img) {
+function money(n) {
+    return Number(n || 0).toFixed(2);
+}
 
-        db.products.push({
+/* PRODUCT IMAGE */
+const imgInput = $('pimg');
+
+if (imgInput) {
+    imgInput.onchange = e => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            alert('Faayiliin kun suuraa miti.');
+            e.target.value = '';
+            return;
+        }
+    };
+}
+
+
+/* PRODUCT SAVE */
+const productForm = $('productForm');
+
+if (productForm) {
+
+    productForm.onsubmit = function(e) {
+
+        e.preventDefault();
+
+        const nameEl = $('pname');
+        const catEl = $('pcat');
+        const buyEl = $('buy');
+        const sellEl = $('sell');
+        const stockEl = $('stock');
+        const minEl = $('minstock');
+        const imgEl = $('pimg');
+
+        const name = nameEl ? nameEl.value.trim() : '';
+        const cat = catEl ? catEl.value.trim() : '';
+        const buy = buyEl ? Number(buyEl.value) : 0;
+        const sell = sellEl ? Number(sellEl.value) : 0;
+        const stock = stockEl ? Number(stockEl.value) : 0;
+        const min = minEl ? Number(minEl.value) : 0;
+        const file = imgEl && imgEl.files ? imgEl.files[0] : null;
+
+
+        if (!name) {
+            alert('Maqaa meeshaa galchi.');
+            return;
+        }
+
+        if (buy <= 0) {
+            alert('Gatii bittaa sirrii galchi.');
+            return;
+        }
+
+        if (sell <= 0) {
+            alert('Gatii gurgurtaa sirrii galchi.');
+            return;
+        }
+
+        if (stock < 0) {
+            alert('Stock sirrii galchi.');
+            return;
+        }
+
+
+        function addProduct(img) {
+
+            db.products.push({
+                id: Date.now(),
+                name: name,
+                cat: cat,
+                buy: buy,
+                sell: sell,
+                stock: stock,
+                min: min,
+                img: img || ''
+            });
+
+            save();
+
+            render();
+
+            productForm.reset();
+
+            alert('✅ Product save ta\'eera!');
+
+        }
+
+
+        /* SAVE WITH IMAGE */
+        if (file) {
+
+            const reader = new FileReader();
+
+            reader.onload = function() {
+                addProduct(reader.result);
+            };
+
+            reader.onerror = function() {
+                alert('Suuraa product dubbisuu hin dandeenye.');
+            };
+
+            reader.readAsDataURL(file);
+
+        } else {
+
+            /* SAVE WITHOUT IMAGE */
+            addProduct('');
+
+        }
+
+    };
+}
+
+
+/* CUSTOMER FORM */
+const customerForm = $('customerForm');
+
+if (customerForm) {
+
+    customerForm.onsubmit = e => {
+
+        e.preventDefault();
+
+        const data = new FormData(customerForm);
+
+        const customer = {
             id: Date.now(),
-            name: name,
-            cat: cat,
-            buy: buy,
-            sell: sell,
-            stock: stock,
-            min: min,
-            img: img || ''
-        });
+            name: data.get('name') || '',
+            phone: data.get('phone') || '',
+            address: data.get('address') || ''
+        };
+
+        db.customers.push(customer);
 
         save();
+
+        customerForm.reset();
+
         render();
 
-        e.target.reset();
+        alert('✅ Customer save ta\'eera!');
 
-        alert('✅ Product save taʼeera!');
     };
+}
 
-    if (file) {
-        const reader = new FileReader();
 
-        reader.onload = function() {
-            addProduct(reader.result);
+/* EXPENSE FORM */
+const expenseForm = $('expenseForm');
+
+if (expenseForm) {
+
+    expenseForm.onsubmit = e => {
+
+        e.preventDefault();
+
+        const data = new FormData(expenseForm);
+
+        const expense = {
+            id: Date.now(),
+            title: data.get('title') || '',
+            amount: Number(data.get('amount') || 0),
+            date: data.get('date') || new Date().toISOString().slice(0,10)
         };
 
-        reader.onerror = function() {
-            alert('Suuraa product dubbisuu hin dandeenye.');
-        };
+        if (!expense.title) {
+            alert('Maqaa expense galchi.');
+            return;
+        }
 
-        reader.readAsDataURL(file);
-    } else {
-        addProduct('');
+        if (expense.amount <= 0) {
+            alert('Hanga maallaqaa sirrii galchi.');
+            return;
+        }
+
+        db.expenses.push(expense);
+
+        save();
+
+        expenseForm.reset();
+
+        render();
+
+        alert('✅ Expense save ta\'eera!');
+
+    };
+}
+
+
+/* DELETE */
+function del(type, id) {
+
+    if (!confirm('Delete gochuu barbaaddaa?')) {
+        return;
     }
-    };
-$('customerForm').onsubmit=e=>{e.preventDefault();db.customers.push({id:Date.now(),name:$('cname').value,phone:$('phone').value,debt:+$('debt').value});e.target.reset();save()}
-$('expenseForm').onsubmit=e=>{e.preventDefault();db.expenses.push({id:Date.now(),date:new Date().toLocaleString(),desc:$('edesc').value,amount:+$('eamount').value});e.target.reset();save()}
-function del(type,id){if(confirm('Delete?')){db[type]=db[type].filter(x=>x.id!=id);save()}}
-function render(){
-$('kProducts').textContent=db.products.length;$('kStock').textContent=db.products.reduce((a,x)=>a+x.stock,0);$('kSales').textContent=db.sales.length;
-let rev=db.sales.reduce((a,x)=>a+x.total,0),cost=db.sales.reduce((a,x)=>a+x.cost,0),exp=db.expenses.reduce((a,x)=>a+x.amount,0);
-$('kRevenue').textContent=money(rev);$('kProfit').textContent=money(rev-cost-exp);$('kExpenses').textContent=money(exp);
-$('rRevenue').textContent=money(rev);$('rCost').textContent=money(cost);$('rGross').textContent=money(rev-cost);$('rExp').textContent=money(exp);$('rNet').textContent=money(rev-cost-exp);
-$('productRows').innerHTML=db.products.map(p=>`<tr><td>${p.img?`<img class="thumb" src="${p.img}">`:'—'}</td><td>${esc(p.name)}</td><td>${esc(p.cat)}</td><td>${money(p.buy)}</td><td>${money(p.sell)}</td><td>${p.stock}${p.stock<=p.min?' ⚠️':''}</td><td><button class="btn danger" onclick="del('products',${p.id})">Delete</button></td></tr>`).join('');
-$('saleProduct').innerHTML=db.products.map(p=>`<option value="${p.id}">${esc(p.name)} — ${money(p.sell)} (Stock ${p.stock})</option>`).join('');
-$('saleRows').innerHTML=db.sales.slice().reverse().map(s=>`<tr><td>${s.date}</td><td>${esc(s.name)}</td><td>${s.qty}</td><td>${money(s.total)}</td><td>${esc(s.pay)}</td><td>${esc(s.customer||'')}</td></tr>`).join('');
-$('customerRows').innerHTML=db.customers.map(c=>`<tr><td>${esc(c.name)}</td><td>${esc(c.phone)}</td><td>${money(c.debt)}</td><td><button class="btn danger" onclick="del('customers',${c.id})">Delete</button></td></tr>`).join('');
-$('expenseRows').innerHTML=db.expenses.slice().reverse().map(x=>`<tr><td>${x.date}</td><td>${esc(x.desc)}</td><td>${money(x.amount)}</td><td><button class="btn danger" onclick="del('expenses',${x.id})">Delete</button></td></tr>`).join('');
-}
-function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
-function backup(){let blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='IBSAA_MANAGER_Backup.json';a.click()}
-function restore(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{db=JSON.parse(r.result);save();alert('Restore milkaaʼe.')}catch{alert('Backup sirrii miti.')}};r.readAsText(f)}
-function clearAll(){if(confirm('Data hunda haqaa?')){db={products:[],sales:[],customers:[],expenses:[]};save()}}
-render();
-</script>
 
-<script>
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(console.error));
+    if (type === 'product') {
+        db.products = db.products.filter(x => x.id !== id);
+    }
+
+    if (type === 'sale') {
+        db.sales = db.sales.filter(x => x.id !== id);
+    }
+
+    if (type === 'customer') {
+        db.customers = db.customers.filter(x => x.id !== id);
+    }
+
+    if (type === 'expense') {
+        db.expenses = db.expenses.filter(x => x.id !== id);
+    }
+
+    save();
+
+    render();
 }
-let deferredInstallPrompt;
+
+
+/* RENDER */
+function render() {
+
+    /* PRODUCTS COUNT */
+    const kProducts = $('kProducts');
+
+    if (kProducts) {
+        kProducts.textContent = db.products.length;
+    }
+
+
+    /* REVENUE */
+    const revenue = db.sales.reduce(
+        (a, x) => a + Number(x.total || 0),
+        0
+    );
+
+
+    /* COST */
+    const cost = db.sales.reduce(
+        (a, x) => a + Number(x.cost || 0),
+        0
+    );
+
+
+    /* PROFIT */
+    const profit = revenue - cost;
+
+
+    const kRevenue = $('kRevenue');
+    if (kRevenue) {
+        kRevenue.textContent = money(revenue);
+    }
+
+
+    const kProfit = $('kProfit');
+    if (kProfit) {
+        kProfit.textContent = money(profit);
+    }
+
+
+    const rRevenue = $('rRevenue');
+    if (rRevenue) {
+        rRevenue.textContent = money(revenue);
+    }
+
+
+    const rCost = $('rCost');
+    if (rCost) {
+        rCost.textContent = money(cost);
+    }
+
+
+    /* PRODUCT ROWS */
+    const productRows = $('productRows');
+
+    if (productRows) {
+
+        productRows.innerHTML = db.products.map(p => `
+            <tr>
+                <td>
+                    ${p.img
+                        ? `<img src="${p.img}" style="width:50px;height:50px;object-fit:cover;border-radius:8px;">`
+                        : '📦'
+                    }
+                </td>
+
+                <td>${esc(p.name)}</td>
+
+                <td>${esc(p.cat || '')}</td>
+
+                <td>${money(p.buy)}</td>
+
+                <td>${money(p.sell)}</td>
+
+                <td>${p.stock}</td>
+
+                <td>
+                    <button onclick="del('product',${p.id})">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+
+    }
+
+
+    /* SALE PRODUCT SELECT */
+    const saleProduct = $('saleProduct');
+
+    if (saleProduct) {
+
+        saleProduct.innerHTML =
+            '<option value="">Select Product</option>' +
+            db.products.map(p => `
+                <option value="${p.id}">
+                    ${esc(p.name)} - ${money(p.sell)}
+                </option>
+            `).join('');
+
+    }
+
+
+    /* SALES */
+    const saleRows = $('saleRows');
+
+    if (saleRows) {
+
+        saleRows.innerHTML = db.sales
+            .slice()
+            .reverse()
+            .map(s => `
+                <tr>
+                    <td>${esc(s.productName || '')}</td>
+                    <td>${s.qty || 0}</td>
+                    <td>${money(s.total)}</td>
+                    <td>
+                        <button onclick="del('sale',${s.id})">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+
+    }
+
+
+    /* CUSTOMERS */
+    const customerRows = $('customerRows');
+
+    if (customerRows) {
+
+        customerRows.innerHTML = db.customers
+            .slice()
+            .reverse()
+            .map(c => `
+                <tr>
+                    <td>${esc(c.name)}</td>
+                    <td>${esc(c.phone)}</td>
+                    <td>${esc(c.address)}</td>
+                    <td>
+                        <button onclick="del('customer',${c.id})">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+
+    }
+
+
+    /* EXPENSES */
+    const expenseRows = $('expenseRows');
+
+    if (expenseRows) {
+
+        expenseRows.innerHTML = db.expenses
+            .slice()
+            .reverse()
+            .map(x => `
+                <tr>
+                    <td>${esc(x.title)}</td>
+                    <td>${money(x.amount)}</td>
+                    <td>${esc(x.date)}</td>
+                    <td>
+                        <button onclick="del('expense',${x.id})">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+
+    }
+
+}
+
+
+/* SECURITY / TEXT */
+function esc(s) {
+
+    return String(s ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+
+}
+
+
+/* INITIAL RENDER */
+render();
+
+</script>
 window.addEventListener("beforeinstallprompt", e => {
   e.preventDefault();
   deferredInstallPrompt = e;
