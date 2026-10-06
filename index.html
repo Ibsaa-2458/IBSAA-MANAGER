@@ -106,13 +106,14 @@ function save(){localStorage.setItem(key,JSON.stringify(db));render()}
 function show(id){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');render()}
 function money(n){return Number(n||0).toFixed(2)}
 $('pimg').onchange=e=>{let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{$('preview').src=r.result;$('preview').hidden=false};r.readAsDataURL(f)}
-$('productForm').onsubmit = e => {
+<script>
+$('productForm').onsubmit = function(e) {
     e.preventDefault();
 
     const name = $('pname').value.trim();
     const cat = $('pcat') ? $('pcat').value : '';
     const buy = Number($('buy').value);
-    const sell = $('sell') ? Number($('sell').value) : buy;
+    const sell = Number($('sell').value);
     const stock = Number($('stock').value);
     const min = $('minstock') ? Number($('minstock').value) : 0;
     const file = $('pimg') ? $('pimg').files[0] : null;
@@ -132,11 +133,7 @@ $('productForm').onsubmit = e => {
         return;
     }
 
-    if (!db.products) {
-        db.products = [];
-    }
-
-    const addProduct = img => {
+    const addProduct = function(img) {
 
         db.products.push({
             id: Date.now(),
@@ -149,10 +146,31 @@ $('productForm').onsubmit = e => {
             img: img || ''
         });
 
-        localStorage.setItem(
-            key,
-            JSON.stringify(db)
-        );
+        save();
+        render();
+
+        e.target.reset();
+
+        alert('✅ Product save taʼeera!');
+    };
+
+    if (file) {
+        const reader = new FileReader();
+
+        reader.onload = function() {
+            addProduct(reader.result);
+        };
+
+        reader.onerror = function() {
+            alert('Suuraa product dubbisuu hin dandeenye.');
+        };
+
+        reader.readAsDataURL(file);
+    } else {
+        addProduct('');
+    }
+    };
+    $('productForm').onsubmit = e => {
 
         render();
 
