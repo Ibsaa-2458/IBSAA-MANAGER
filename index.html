@@ -170,37 +170,6 @@ $('productForm').onsubmit = function(e) {
         addProduct('');
     }
     };
-    $('productForm').onsubmit = e => {
-
-        render();
-
-        e.target.reset();
-
-        alert('✅ Product sirriitti save ta\'eera!');
-    };
-
-    if (file) {
-        const reader = new FileReader();
-
-        reader.onload = () => {
-            addProduct(reader.result);
-        };
-
-        reader.onerror = () => {
-            alert('Suuraa dubbisuu hin dandeenye.');
-        };
-
-        reader.readAsDataURL(file);
-
-    } else {
-        addProduct('');
-    }
-};
-    addProduct('');
-  }
-};
-} else {
-  addProduct('');
 }$('customerForm').onsubmit=e=>{e.preventDefault();db.customers.push({id:Date.now(),name:$('cname').value,phone:$('phone').value,debt:+$('debt').value});e.target.reset();save()}
 $('expenseForm').onsubmit=e=>{e.preventDefault();db.expenses.push({id:Date.now(),date:new Date().toLocaleString(),desc:$('edesc').value,amount:+$('eamount').value});e.target.reset();save()}
 function del(type,id){if(confirm('Delete?')){db[type]=db[type].filter(x=>x.id!=id);save()}}
