@@ -1757,3 +1757,32 @@ showSection('dashboard');
 
 </body>
 </html>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+  import {
+    getFirestore,
+    collection,
+    addDoc,
+    getDocs,
+    updateDoc,
+    deleteDoc,
+    doc
+  } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDwxoC0NXVNhM_hiRs82sORhdP5U1OqBNg",
+    authDomain: "esy-shop.firebaseapp.com",
+    projectId: "esy-shop",
+    storageBucket: "esy-shop.firebasestorage.app",
+    messagingSenderId: "949163203145",
+    appId: "1:949163203145:web:dd969e18fa4dcf8bfabd98"
+  };
+
+  const app = initializeApp(firebaseConfig);
+
+  // Firestore database
+  const db = getFirestore(app);
+
+  console.log("🔥 ESY SHOP Firebase connected!");
+</script>
+
