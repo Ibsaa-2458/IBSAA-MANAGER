@@ -1,1 +1,1759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0f172a">
+<title>ESY SHOP - General Store Manager</title>
 
+<style>
+*{box-sizing:border-box}
+
+body{
+margin:0;
+font-family:Arial,sans-serif;
+background:#f1f5f9;
+color:#0f172a;
+}
+
+header{
+background:#0f172a;
+color:white;
+padding:15px;
+position:sticky;
+top:0;
+z-index:20;
+}
+
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.brand{
+font-size:23px;
+font-weight:bold;
+}
+
+.sub{
+font-size:11px;
+color:#cbd5e1;
+margin-top:3px;
+}
+
+main{
+max-width:1100px;
+margin:auto;
+padding:15px;
+}
+
+nav{
+display:flex;
+gap:7px;
+overflow-x:auto;
+padding:10px 0;
+position:sticky;
+top:65px;
+background:#f1f5f9;
+z-index:10;
+}
+
+nav button{
+white-space:nowrap;
+background:white;
+color:#334155;
+border:1px solid #cbd5e1;
+border-radius:10px;
+padding:10px 14px;
+font-weight:bold;
+}
+
+nav button.active{
+background:#2563eb;
+color:white;
+}
+
+button{
+border:0;
+border-radius:10px;
+padding:10px 14px;
+font-weight:bold;
+cursor:pointer;
+}
+
+.primary{
+background:#2563eb;
+color:white;
+}
+
+.danger{
+background:#dc2626;
+color:white;
+}
+
+.dark{
+background:#334155;
+color:white;
+}
+
+.section{
+display:none;
+}
+
+.section.active{
+display:block;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+gap:12px;
+}
+
+.card{
+background:white;
+border-radius:16px;
+padding:15px;
+margin-bottom:12px;
+box-shadow:0 2px 10px rgba(0,0,0,.06);
+}
+
+.kpi{
+font-size:25px;
+font-weight:bold;
+margin-top:6px;
+}
+
+.muted{
+font-size:13px;
+color:#64748b;
+}
+
+.total{
+font-size:21px;
+font-weight:bold;
+}
+
+form{
+display:grid;
+gap:10px;
+}
+
+.row{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+}
+
+input,select{
+width:100%;
+padding:11px;
+border:1px solid #cbd5e1;
+border-radius:9px;
+font-size:15px;
+background:white;
+}
+
+label{
+font-size:13px;
+font-weight:bold;
+}
+
+.tablewrap{
+overflow-x:auto;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+font-size:13px;
+}
+
+th,td{
+padding:9px;
+border-bottom:1px solid #e2e8f0;
+text-align:left;
+white-space:nowrap;
+}
+
+th{
+background:#f8fafc;
+}
+
+.product-img{
+width:55px;
+height:55px;
+object-fit:cover;
+border-radius:9px;
+background:#e2e8f0;
+}
+
+.badge{
+display:inline-block;
+padding:4px 8px;
+border-radius:20px;
+background:#dbeafe;
+color:#1d4ed8;
+font-size:11px;
+font-weight:bold;
+}
+
+.low{
+background:#fee2e2;
+color:#b91c1c;
+}
+
+.empty{
+text-align:center;
+padding:25px;
+color:#64748b;
+}
+
+.actions{
+display:flex;
+gap:7px;
+flex-wrap:wrap;
+}
+
+@media(max-width:600px){
+.row{
+grid-template-columns:1fr;
+}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<div class="header">
+
+<div>
+<div class="brand">🛒 ESY SHOP</div>
+<div class="sub">General Store POS & Management System</div>
+</div>
+
+<button class="dark" onclick="showSection('dashboard')">
+🏠
+</button>
+
+</div>
+</header>
+
+
+<main>
+
+<nav>
+
+<button onclick="showSection('dashboard')" data-section="dashboard">
+Dashboard
+</button>
+
+<button onclick="showSection('products')" data-section="products">
+Products
+</button>
+
+<button onclick="showSection('sales')" data-section="sales">
+Sales
+</button>
+
+<button onclick="showSection('customers')" data-section="customers">
+Customers
+</button>
+
+<button onclick="showSection('expenses')" data-section="expenses">
+Expenses
+</button>
+
+<button onclick="showSection('reports')" data-section="reports">
+Reports
+</button>
+
+</nav>
+
+
+<!-- DASHBOARD -->
+
+<section id="dashboard" class="section active">
+
+<div class="grid">
+
+<div class="card">
+<div class="muted">Products</div>
+<div class="kpi" id="kProducts">0</div>
+</div>
+
+<div class="card">
+<div class="muted">Stock Units</div>
+<div class="kpi" id="kStock">0</div>
+</div>
+
+<div class="card">
+<div class="muted">Sales Revenue</div>
+<div class="kpi" id="kRevenue">0.00</div>
+</div>
+
+<div class="card">
+<div class="muted">Net Profit</div>
+<div class="kpi" id="kProfit">0.00</div>
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h3>💰 Quick Sale</h3>
+
+<form id="quickSaleForm">
+
+<select id="saleProduct" required>
+<option value="">Select product</option>
+</select>
+
+<div class="row">
+
+<input
+id="saleQty"
+type="number"
+min="1"
+value="1"
+placeholder="Quantity"
+required
+>
+
+<select id="salePayment">
+
+<option>Cash</option>
+<option>Bank Transfer</option>
+<option>Mobile Money</option>
+<option>Credit</option>
+
+</select>
+
+</div>
+
+<input
+id="saleCustomer"
+placeholder="Customer name (optional)"
+>
+
+<button class="primary">
+💰 Record Sale
+</button>
+
+</form>
+
+</div>
+
+
+<div class="card">
+
+<h3>⚠️ Low Stock</h3>
+
+<div id="lowStock"></div>
+
+</div>
+
+</section>
+
+
+<!-- PRODUCTS -->
+
+<section id="products" class="section">
+
+<div class="card">
+
+<h3>➕ Add Product</h3>
+
+<form id="productForm">
+
+<input
+id="pname"
+placeholder="Product name"
+required
+>
+
+<div class="row">
+
+<input
+id="pcat"
+placeholder="Category"
+>
+
+<input
+id="buy"
+type="number"
+min="0"
+step="0.01"
+placeholder="Buying price"
+required
+>
+
+</div>
+
+<div class="row">
+
+<input
+id="sell"
+type="number"
+min="0"
+step="0.01"
+placeholder="Selling price"
+required
+>
+
+<input
+id="stock"
+type="number"
+min="0"
+placeholder="Stock quantity"
+required
+>
+
+</div>
+
+<input
+id="minstock"
+type="number"
+min="0"
+value="5"
+placeholder="Minimum stock alert"
+>
+
+<label>
+📷 Product Image — Camera / Gallery
+</label>
+
+<input
+id="pimg"
+type="file"
+accept="image/*"
+capture="environment"
+>
+
+<button class="primary">
+💾 Save Product
+</button>
+
+</form>
+
+</div>
+
+
+<div class="card">
+
+<h3>📦 Product List</h3>
+
+<div class="tablewrap">
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Image</th>
+<th>Name</th>
+<th>Category</th>
+<th>Buy</th>
+<th>Sell</th>
+<th>Stock</th>
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody id="productRows"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- SALES -->
+
+<section id="sales" class="section">
+
+<div class="card">
+
+<h3>💰 Sales History</h3>
+
+<div class="tablewrap">
+
+<table>
+
+<thead>
+
+<tr>
+<th>Date</th>
+<th>Product</th>
+<th>Qty</th>
+<th>Total</th>
+<th>Profit</th>
+<th>Payment</th>
+<th>Action</th>
+</tr>
+
+</thead>
+
+<tbody id="saleRows"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- CUSTOMERS -->
+
+<section id="customers" class="section">
+
+<div class="card">
+
+<h3>👤 Add Customer</h3>
+
+<form id="customerForm">
+
+<input
+id="cname"
+placeholder="Customer name"
+required
+>
+
+<input
+id="cphone"
+placeholder="Phone number"
+>
+
+<input
+id="caddress"
+placeholder="Address"
+>
+
+<button class="primary">
+Save Customer
+</button>
+
+</form>
+
+</div>
+
+
+<div class="card">
+
+<h3>Customer List</h3>
+
+<div class="tablewrap">
+
+<table>
+
+<thead>
+
+<tr>
+<th>Name</th>
+<th>Phone</th>
+<th>Address</th>
+<th>Action</th>
+</tr>
+
+</thead>
+
+<tbody id="customerRows"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- EXPENSES -->
+
+<section id="expenses" class="section">
+
+<div class="card">
+
+<h3>➕ Add Expense</h3>
+
+<form id="expenseForm">
+
+<input
+id="expenseName"
+placeholder="Expense description"
+required
+>
+
+<div class="row">
+
+<select id="expenseType">
+
+<option>Rent</option>
+<option>Transport</option>
+<option>Electricity</option>
+<option>Water</option>
+<option>Salary</option>
+<option>Maintenance</option>
+<option>Other</option>
+
+</select>
+
+<input
+id="expenseAmount"
+type="number"
+min="0"
+step="0.01"
+placeholder="Amount"
+required
+>
+
+</div>
+
+<button class="primary">
+Save Expense
+</button>
+
+</form>
+
+</div>
+
+
+<div class="card">
+
+<h3>Expense History</h3>
+
+<div class="tablewrap">
+
+<table>
+
+<thead>
+
+<tr>
+<th>Date</th>
+<th>Description</th>
+<th>Type</th>
+<th>Amount</th>
+<th>Action</th>
+</tr>
+
+</thead>
+
+<tbody id="expenseRows"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- REPORTS -->
+
+<section id="reports" class="section">
+
+<div class="grid">
+
+<div class="card">
+<div class="muted">Total Revenue</div>
+<div class="total" id="rRevenue">0.00</div>
+</div>
+
+<div class="card">
+<div class="muted">Cost of Goods</div>
+<div class="total" id="rCost">0.00</div>
+</div>
+
+<div class="card">
+<div class="muted">Gross Profit</div>
+<div class="total" id="rProfit">0.00</div>
+</div>
+
+<div class="card">
+<div class="muted">Expenses</div>
+<div class="total" id="rExpenses">0.00</div>
+</div>
+
+<div class="card">
+<div class="muted">Net Profit</div>
+<div class="total" id="rNet">0.00</div>
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h3>💾 Data Backup</h3>
+
+<div class="actions">
+
+<button class="primary" onclick="exportData()">
+⬇️ Backup Data
+</button>
+
+<button
+class="dark"
+onclick="document.getElementById('importFile').click()"
+>
+⬆️ Restore Data
+</button>
+
+<button class="danger" onclick="clearAll()">
+🗑️ Delete All Data
+</button>
+
+</div>
+
+<input
+id="importFile"
+type="file"
+accept=".json"
+style="display:none"
+>
+
+</div>
+
+</section>
+
+</main>
+
+
+<script>
+
+const KEY='ESY_SHOP_V3_WEB';
+
+let db={
+products:[],
+sales:[],
+customers:[],
+expenses:[]
+};
+
+
+try{
+
+const saved=localStorage.getItem(KEY);
+
+if(saved){
+
+const x=JSON.parse(saved);
+
+db={
+products:Array.isArray(x.products)?x.products:[],
+sales:Array.isArray(x.sales)?x.sales:[],
+customers:Array.isArray(x.customers)?x.customers:[],
+expenses:Array.isArray(x.expenses)?x.expenses:[]
+};
+
+}
+
+}catch(e){
+
+console.log(e);
+
+}
+
+
+const $=id=>document.getElementById(id);
+
+function money(n){
+
+return Number(n||0).toFixed(2);
+
+}
+
+
+function save(){
+
+try{
+
+localStorage.setItem(
+KEY,
+JSON.stringify(db)
+);
+
+}catch(e){
+
+alert(
+'Data baayee guddaa dha. Suuraa muraasa xiqqeessi.'
+);
+
+}
+
+}
+
+
+function esc(s){
+
+return String(s??'')
+
+.replace(/&/g,'&amp;')
+
+.replace(/</g,'&lt;')
+
+.replace(/>/g,'&gt;')
+
+.replace(/"/g,'&quot;')
+
+.replace(/'/g,'&#039;');
+
+}
+
+
+function showSection(id){
+
+document
+.querySelectorAll('.section')
+.forEach(x=>{
+x.classList.remove('active');
+});
+
+const section=$(id);
+
+if(section)
+section.classList.add('active');
+
+
+document
+.querySelectorAll('nav button')
+.forEach(x=>{
+
+x.classList.toggle(
+'active',
+x.dataset.section===id
+);
+
+});
+
+render();
+
+window.scrollTo(0,0);
+
+}
+
+
+function render(){
+
+const revenue=db.sales.reduce(
+(a,x)=>a+Number(x.total||0),0
+);
+
+const cost=db.sales.reduce(
+(a,x)=>a+Number(x.cost||0),0
+);
+
+const profit=db.sales.reduce(
+(a,x)=>a+Number(x.profit||0),0
+);
+
+const expenses=db.expenses.reduce(
+(a,x)=>a+Number(x.amount||0),0
+);
+
+const stock=db.products.reduce(
+(a,x)=>a+Number(x.stock||0),0
+);
+
+
+$('kProducts').textContent=
+db.products.length;
+
+$('kStock').textContent=
+stock;
+
+$('kRevenue').textContent=
+money(revenue);
+
+$('kProfit').textContent=
+money(profit-expenses);
+
+
+$('rRevenue').textContent=
+money(revenue);
+
+$('rCost').textContent=
+money(cost);
+
+$('rProfit').textContent=
+money(profit);
+
+$('rExpenses').textContent=
+money(expenses);
+
+$('rNet').textContent=
+money(profit-expenses);
+
+
+$('saleProduct').innerHTML=
+'<option value="">Select product</option>'+
+
+db.products.map(p=>`
+
+<option value="${p.id}">
+
+${esc(p.name)}
+—
+Stock ${p.stock}
+
+</option>
+
+`).join('');
+
+
+$('productRows').innerHTML=
+db.products.length?
+
+db.products.map(p=>`
+
+<tr>
+
+<td>
+
+${
+p.img
+?
+`<img
+class="product-img"
+src="${p.img}"
+alt="product">`
+:
+'📦'
+}
+
+</td>
+
+<td>
+<b>${esc(p.name)}</b>
+</td>
+
+<td>
+${esc(p.cat||'-')}
+</td>
+
+<td>
+${money(p.buy)}
+</td>
+
+<td>
+${money(p.sell)}
+</td>
+
+<td>
+
+<span class="badge ${
+Number(p.stock)<=Number(p.min||0)
+?'low':''
+}">
+
+${p.stock}
+
+</span>
+
+</td>
+
+<td>
+
+<button
+class="danger"
+onclick="delProduct('${p.id}')"
+>
+
+Delete
+
+</button>
+
+</td>
+
+</tr>
+
+`).join('')
+
+:
+
+`<tr>
+<td colspan="7" class="empty">
+No products yet.
+</td>
+</tr>`;
+
+
+$('saleRows').innerHTML=
+db.sales.length?
+
+db.sales
+.slice()
+.reverse()
+.map(s=>`
+
+<tr>
+
+<td>
+${esc(s.date)}
+</td>
+
+<td>
+${esc(s.product)}
+</td>
+
+<td>
+${s.qty}
+</td>
+
+<td>
+${money(s.total)}
+</td>
+
+<td>
+${money(s.profit)}
+</td>
+
+<td>
+${esc(s.payment)}
+</td>
+
+<td>
+
+<button
+class="danger"
+onclick="delSale('${s.id}')"
+>
+
+Delete
+
+</button>
+
+</td>
+
+</tr>
+
+`).join('')
+
+:
+
+`<tr>
+<td colspan="7" class="empty">
+No sales yet.
+</td>
+</tr>`;
+
+
+$('customerRows').innerHTML=
+db.customers.length?
+
+db.customers.map(c=>`
+
+<tr>
+
+<td>
+${esc(c.name)}
+</td>
+
+<td>
+${esc(c.phone||'-')}
+</td>
+
+<td>
+${esc(c.address||'-')}
+</td>
+
+<td>
+
+<button
+class="danger"
+onclick="delCustomer('${c.id}')"
+>
+
+Delete
+
+</button>
+
+</td>
+
+</tr>
+
+`).join('')
+
+:
+
+`<tr>
+<td colspan="4" class="empty">
+No customers yet.
+</td>
+</tr>`;
+
+
+$('expenseRows').innerHTML=
+db.expenses.length?
+
+db.expenses
+.slice()
+.reverse()
+.map(x=>`
+
+<tr>
+
+<td>
+${esc(x.date)}
+</td>
+
+<td>
+${esc(x.name)}
+</td>
+
+<td>
+${esc(x.type)}
+</td>
+
+<td>
+${money(x.amount)}
+</td>
+
+<td>
+
+<button
+class="danger"
+onclick="delExpense('${x.id}')"
+>
+
+Delete
+
+</button>
+
+</td>
+
+</tr>
+
+`).join('')
+
+:
+
+`<tr>
+<td colspan="5" class="empty">
+No expenses yet.
+</td>
+</tr>`;
+
+
+const low=db.products.filter(
+p=>Number(p.stock)<=Number(p.min||0)
+);
+
+
+$('lowStock').innerHTML=
+
+low.length?
+
+low.map(p=>`
+
+<div
+class="card"
+style="padding:10px;margin:5px 0"
+>
+
+<b>${esc(p.name)}</b>
+
+—
+${p.stock} left
+
+</div>
+
+`).join('')
+
+:
+
+'<div class="empty">✅ Stock level is OK.</div>';
+
+}
+
+
+function imageToDataURL(file,callback){
+
+if(!file){
+
+callback('');
+
+return;
+
+}
+
+if(!file.type.startsWith('image/')){
+
+alert('Faayiliin kun suuraa miti.');
+
+return;
+
+}
+
+const reader=new FileReader();
+
+reader.onload=function(){
+
+callback(reader.result);
+
+};
+
+reader.onerror=function(){
+
+alert('Suuraa dubbisuu hin dandeenye.');
+
+};
+
+reader.readAsDataURL(file);
+
+}
+
+
+$('productForm')
+.addEventListener(
+'submit',
+function(e){
+
+e.preventDefault();
+
+
+const name=
+$('pname').value.trim();
+
+const cat=
+$('pcat').value.trim();
+
+const buy=
+Number($('buy').value);
+
+const sell=
+Number($('sell').value);
+
+const stock=
+Number($('stock').value);
+
+const min=
+Number($('minstock').value||0);
+
+const file=
+$('pimg').files[0];
+
+
+if(!name){
+
+alert('Maqaa product galchi.');
+
+return;
+
+}
+
+
+if(
+buy<0 ||
+sell<=0 ||
+stock<0
+){
+
+alert(
+'Gatii fi stock sirrii galchi.'
+);
+
+return;
+
+}
+
+
+function addProduct(img){
+
+db.products.push({
+
+id:Date.now().toString(),
+
+name:name,
+
+cat:cat,
+
+buy:buy,
+
+sell:sell,
+
+stock:stock,
+
+min:min,
+
+img:img||''
+
+});
+
+
+save();
+
+render();
+
+$('productForm').reset();
+
+$('minstock').value=5;
+
+alert(
+'✅ Product save taʼeera!'
+);
+
+}
+
+
+if(file){
+
+imageToDataURL(
+file,
+addProduct
+);
+
+}else{
+
+addProduct('');
+
+}
+
+});
+
+
+$('quickSaleForm')
+.addEventListener(
+'submit',
+function(e){
+
+e.preventDefault();
+
+
+const pid=
+$('saleProduct').value;
+
+const qty=
+Number($('saleQty').value);
+
+const payment=
+$('salePayment').value;
+
+const customer=
+$('saleCustomer').value.trim();
+
+
+const p=
+db.products.find(
+x=>x.id===pid
+);
+
+
+if(!p){
+
+alert('Product filadhu.');
+
+return;
+
+}
+
+
+if(qty<=0){
+
+alert(
+'Quantity sirrii galchi.'
+);
+
+return;
+
+}
+
+
+if(qty>Number(p.stock)){
+
+alert(
+'Stock gahaa miti.'
+);
+
+return;
+
+}
+
+
+const total=
+qty*Number(p.sell);
+
+const cost=
+qty*Number(p.buy);
+
+const profit=
+total-cost;
+
+
+p.stock-=qty;
+
+
+db.sales.push({
+
+id:Date.now().toString(),
+
+date:new Date()
+.toLocaleString(),
+
+product:p.name,
+
+productId:p.id,
+
+qty:qty,
+
+total:total,
+
+cost:cost,
+
+profit:profit,
+
+payment:payment,
+
+customer:customer
+
+});
+
+
+save();
+
+render();
+
+$('quickSaleForm').reset();
+
+$('saleQty').value=1;
+
+
+alert(
+'✅ Gurgurtaan galmaaʼeera!'
+);
+
+});
+
+
+$('customerForm')
+.addEventListener(
+'submit',
+function(e){
+
+e.preventDefault();
+
+
+db.customers.push({
+
+id:Date.now().toString(),
+
+name:$('cname')
+.value.trim(),
+
+phone:$('cphone')
+.value.trim(),
+
+address:$('caddress')
+.value.trim()
+
+});
+
+
+save();
+
+render();
+
+$('customerForm').reset();
+
+alert(
+'✅ Customer save taʼeera!'
+);
+
+});
+
+
+$('expenseForm')
+.addEventListener(
+'submit',
+function(e){
+
+e.preventDefault();
+
+
+const amount=
+Number($('expenseAmount').value);
+
+
+if(amount<=0){
+
+alert(
+'Amount sirrii galchi.'
+);
+
+return;
+
+}
+
+
+db.expenses.push({
+
+id:Date.now().toString(),
+
+date:new Date()
+.toLocaleString(),
+
+name:$('expenseName')
+.value.trim(),
+
+type:$('expenseType')
+.value,
+
+amount:amount
+
+});
+
+
+save();
+
+render();
+
+$('expenseForm').reset();
+
+alert(
+'✅ Expense save taʼeera!'
+);
+
+});
+
+
+function delProduct(id){
+
+if(!confirm(
+'Product kana haquu barbaaddaa?'
+))return;
+
+db.products=
+db.products.filter(
+x=>x.id!==id
+);
+
+save();
+
+render();
+
+}
+
+
+function delSale(id){
+
+if(!confirm(
+'Sale kana haquu barbaaddaa? Stock deebisuu barbaaddaa?'
+))return;
+
+
+const s=
+db.sales.find(
+x=>x.id===id
+);
+
+const p=
+s &&
+db.products.find(
+x=>x.id===s.productId
+);
+
+
+if(p){
+
+p.stock+=Number(
+s.qty||0
+);
+
+}
+
+
+db.sales=
+db.sales.filter(
+x=>x.id!==id
+);
+
+save();
+
+render();
+
+}
+
+
+function delCustomer(id){
+
+if(!confirm(
+'Customer kana haquu barbaaddaa?'
+))return;
+
+db.customers=
+db.customers.filter(
+x=>x.id!==id
+);
+
+save();
+
+render();
+
+}
+
+
+function delExpense(id){
+
+if(!confirm(
+'Expense kana haquu barbaaddaa?'
+))return;
+
+db.expenses=
+db.expenses.filter(
+x=>x.id!==id
+);
+
+save();
+
+render();
+
+}
+
+
+function exportData(){
+
+const blob=
+new Blob(
+[
+JSON.stringify(
+db,
+null,
+2
+)
+],
+{
+type:'application/json'
+}
+);
+
+
+const url=
+URL.createObjectURL(blob);
+
+const a=
+document.createElement('a');
+
+a.href=url;
+
+a.download=
+'ESY_SHOP_Backup.json';
+
+a.click();
+
+URL.revokeObjectURL(url);
+
+}
+
+
+$('importFile')
+.addEventListener(
+'change',
+function(){
+
+const file=
+this.files[0];
+
+if(!file)return;
+
+
+const reader=
+new FileReader();
+
+
+reader.onload=function(){
+
+try{
+
+const x=
+JSON.parse(
+reader.result
+);
+
+
+if(
+!x.products ||
+!x.sales ||
+!x.customers ||
+!x.expenses
+){
+
+throw new Error();
+
+}
+
+
+db=x;
+
+save();
+
+render();
+
+alert(
+'✅ Backup restore taʼeera!'
+);
+
+
+}catch(e){
+
+alert(
+'Backup file sirrii miti.'
+);
+
+}
+
+};
+
+
+reader.readAsText(file);
+
+this.value='';
+
+});
+
+
+function clearAll(){
+
+if(!confirm(
+'DATA HUNDA haquu barbaaddaa? Kun deebifamuu hin dandaʼu.'
+))return;
+
+
+localStorage.removeItem(KEY);
+
+
+db={
+products:[],
+sales:[],
+customers:[],
+expenses:[]
+};
+
+
+render();
+
+
+alert(
+'Data hundi haqameera.'
+);
+
+}
+
+
+showSection('dashboard');
+
+</script>
+
+</body>
+</html>
